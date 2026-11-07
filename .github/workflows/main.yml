@@ -12,3 +12,36 @@ jobs:
       # step 1 checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      # Step 2: Update index.html
+      - name: Update HTML
+        run: |
+          # Check if the GitHub actor is the team leader
+          if [ "${{ github.actor }}" == "Nsalt13" ]; then
+          sed -i '/<\/body>/i <p>Updated by Leader on '"$(date)"'</p>' index.html
+
+          # another member
+          if [ "${{ github.actor }}" == "member1_username" ]; then
+          sed -i '/<\/body>/i <p>Updated by Member 1 on '"$(date)"'</p>' index.h
+
+          # Step 3 Update README file
+          - name: Update README
+            run: 
+              echo "### Updated by ${{ github.actor }} on $(date '+%Y-%m-%d %H:%M:%S') [Commit: $(git rev-parse --short HEAD)]" >> README.md
+
+          # Step 4 Commit Changes to index.html and README
+          - name: Commit and Push Changes
+            run: |
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email"github-actions[bot]@users.noreply.github.com"
+              git add .
+              git commit -m "Workflow: Updated HTML and README for ${{ github.actor}}" || echo "No changes to commit"
+              git remote set-urlorigin https://x-access-token:${{ secrets.GITHUB_TOKEN}}@github.com/${{ github.repository}}
+              git push origin main
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+
+      
+        
+
+        
